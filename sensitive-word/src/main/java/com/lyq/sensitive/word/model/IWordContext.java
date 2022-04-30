@@ -1,19 +1,11 @@
-package com.lyq.sensitive.word;
-
-import java.util.Map;
+package com.lyq.sensitive.word.model;
 
 /**
  * @author Emcikem
  * @create 2022/4/30
- * @desc 上下文
+ * @desc 应用上下文
  */
-public class WordContext {
-
-    public WordContext() {}
-
-    public static WordContext newInstance() {
-        return new WordContext();
-    }
+public class IWordContext {
 
     /**
      * 忽略大小写
@@ -60,16 +52,11 @@ public class WordContext {
      */
     private boolean sensitiveCheckUrl;
 
-    /**
-     * 敏感词信息
-     */
-    private Map<String, Object> sensitiveWordMap;
-
     public boolean ignoreCase() {
         return ignoreCase;
     }
 
-    public WordContext ignoreCase(boolean ignoreCase) {
+    public IWordContext ignoreCase(boolean ignoreCase) {
         this.ignoreCase = ignoreCase;
         return this;
     }
@@ -78,7 +65,7 @@ public class WordContext {
         return ignoreWidth;
     }
 
-    public WordContext ignoreWidth(boolean ignoreWidth) {
+    public IWordContext ignoreWidth(boolean ignoreWidth) {
         this.ignoreWidth = ignoreWidth;
         return this;
     }
@@ -87,17 +74,8 @@ public class WordContext {
         return ignoreNumStyle;
     }
 
-    public WordContext ignoreNumStyle(boolean ignoreNumStyle) {
+    public IWordContext ignoreNumStyle(boolean ignoreNumStyle) {
         this.ignoreNumStyle = ignoreNumStyle;
-        return this;
-    }
-
-    public Map<String, Object> sensitiveWordMap() {
-        return sensitiveWordMap;
-    }
-
-    public WordContext sensitiveWordMap(Map sensitiveWordMap) {
-        this.sensitiveWordMap = sensitiveWordMap;
         return this;
     }
 
@@ -105,7 +83,7 @@ public class WordContext {
         return sensitiveCheckNum;
     }
 
-    public WordContext sensitiveCheckNum(boolean sensitiveCheckNum) {
+    public IWordContext sensitiveCheckNum(boolean sensitiveCheckNum) {
         this.sensitiveCheckNum = sensitiveCheckNum;
         return this;
     }
@@ -114,7 +92,7 @@ public class WordContext {
         return ignoreChineseStyle;
     }
 
-    public WordContext ignoreChineseStyle(boolean ignoreChineseStyle) {
+    public IWordContext ignoreChineseStyle(boolean ignoreChineseStyle) {
         this.ignoreChineseStyle = ignoreChineseStyle;
         return this;
     }
@@ -123,7 +101,7 @@ public class WordContext {
         return ignoreEnglishStyle;
     }
 
-    public WordContext ignoreEnglishStyle(boolean ignoreEnglishStyle) {
+    public IWordContext ignoreEnglishStyle(boolean ignoreEnglishStyle) {
         this.ignoreEnglishStyle = ignoreEnglishStyle;
         return this;
     }
@@ -132,7 +110,7 @@ public class WordContext {
         return ignoreRepeat;
     }
 
-    public WordContext ignoreRepeat(boolean ignoreRepeat) {
+    public IWordContext ignoreRepeat(boolean ignoreRepeat) {
         this.ignoreRepeat = ignoreRepeat;
         return this;
     }
@@ -141,7 +119,7 @@ public class WordContext {
         return sensitiveCheckEmail;
     }
 
-    public WordContext sensitiveCheckEmail(boolean sensitiveCheckEmail) {
+    public IWordContext sensitiveCheckEmail(boolean sensitiveCheckEmail) {
         this.sensitiveCheckEmail = sensitiveCheckEmail;
         return this;
     }
@@ -150,7 +128,7 @@ public class WordContext {
         return sensitiveCheckUrl;
     }
 
-    public WordContext sensitiveCheckUrl(boolean sensitiveCheckUrl) {
+    public IWordContext sensitiveCheckUrl(boolean sensitiveCheckUrl) {
         this.sensitiveCheckUrl = sensitiveCheckUrl;
         return this;
     }

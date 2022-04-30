@@ -4,8 +4,8 @@ import java.util.List;
 
 /**
  * @author Emcikem
- * @create 2022/4/29
- * @desc 敏感词工具类
+ * @create 2022/4/30
+ * @desc
  */
 public interface ISensitiveWordService {
 
@@ -14,21 +14,14 @@ public interface ISensitiveWordService {
      */
     boolean contains(final String target);
 
+
     /**
-     * 返回所有的敏感词
-     * 1. 这里是默认去重的，且是有序的
-     * 2. 如果不存在，返回空列表
+     * 返回所有敏感词
      */
     List<String> findAll(final String target);
 
     /**
-     * 返回第一个敏感词
-     */
-    String findFirst(final String target);
-
-
-    /**
-     * 替换所有内容，自定义替换策略
+     * 替换所有内容
      */
     String replace(final String target, final ISensitiveWordReplace replace);
 
@@ -38,19 +31,12 @@ public interface ISensitiveWordService {
     String replace(final String target, final char replaceChar);
 
     /**
-     * 默认用 * 替换
+     * 默认用*替换所有内容
      */
     String replace(final String target);
 
-    /**
-     * 返回第一个敏感词
-     */
-    <R> List<R> findAll(final String target, final IWordResultHandler<R> handler);
 
 
-    /**
-     * 返回第一个敏感词
-     */
-    <R> R findFirst(final String target, final IWordResultHandler<R> handler);
+
 
 }
