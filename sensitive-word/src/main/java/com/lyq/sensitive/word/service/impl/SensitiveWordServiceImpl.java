@@ -1,10 +1,15 @@
 package com.lyq.sensitive.word.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.lyq.sensitive.word.WordContext;
 import com.lyq.sensitive.word.constant.CharConst;
 import com.lyq.sensitive.word.service.*;
+import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -14,7 +19,14 @@ import java.util.List;
  */
 public class SensitiveWordServiceImpl implements ISensitiveWordService{
 
-    private SensitiveWordServiceImpl() {}
+    private SensitiveWordServiceImpl() {
+
+    }
+
+    /**
+     * 敏感词 map
+     */
+    private IWordMap sensitiveWordMap;
 
     /**
      * 默认的执行上下文
@@ -34,6 +46,7 @@ public class SensitiveWordServiceImpl implements ISensitiveWordService{
     public static SensitiveWordServiceImpl newInstance() {
         return new SensitiveWordServiceImpl();
     }
+
 
     /**
      * 初始化
@@ -153,7 +166,7 @@ public class SensitiveWordServiceImpl implements ISensitiveWordService{
 
     @Override
     public boolean contains(String target) {
-        return false;
+        return sensitiveWordMap.contains(target, context);
     }
 
     @Override
