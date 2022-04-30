@@ -2,21 +2,34 @@ package com.lyq.sensitive.word.service.impl;
 
 import com.lyq.sensitive.word.WordContext;
 import com.lyq.sensitive.word.constant.CharConst;
-import com.lyq.sensitive.word.service.ISensitiveWordService;
+import com.lyq.sensitive.word.service.*;
 
 import java.util.List;
+
 
 /**
  * @author Emcikem
  * @create 2022/4/30
  * @desc 敏感词引导类
  */
-public class SensitiveWordServiceImpl implements ISensitiveWordService {
+public class SensitiveWordServiceImpl implements ISensitiveWordService{
 
     private SensitiveWordServiceImpl() {}
 
+    /**
+     * 默认的执行上下文
+     */
     private final WordContext context = this.buildDefaultContext();
 
+    /**
+     * 禁止的单词
+     */
+    private IWordDeny wordDeny;
+
+    /**
+     * 运行的单词
+     */
+    private IWordAllow wordAllow;
 
     public static SensitiveWordServiceImpl newInstance() {
         return new SensitiveWordServiceImpl();
@@ -27,7 +40,7 @@ public class SensitiveWordServiceImpl implements ISensitiveWordService {
      * 根据配置，初始化对应的map，比较消耗性能
      */
     public SensitiveWordServiceImpl init() {
-        this.initWordMap();
+//        this.initWordMap();
         return this;
     }
 
@@ -165,7 +178,7 @@ public class SensitiveWordServiceImpl implements ISensitiveWordService {
 
     @Override
     public String replace(String target) {
-        return this.replace(target, CharConst.STAR);
+        return replace(target, CharConst.STAR);
     }
 
     @Override
