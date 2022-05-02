@@ -1,70 +1,90 @@
 package com.lyq.sensitiveword.service.ac;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Emcikem
- * @create 2022/5/1
+ * @create 2022/5/2
  * @desc
  */
 public class TrieNode {
-
-    /**
-     * 节点值
-     */
-    private char data;
-
-    /**
-     * 是否是模式串的结束节点
-     */
-    private boolean isEndChar = false;
-
-    /**
-     * 失败节点
-     */
-    private TrieNode failNode;
-
-    /**
-     * 模式串长度
-     */
-    private int length = 0; // 模式串长度
-
-    /**
-     * 子节点
-     */
     private Map<Character, TrieNode> children;
 
-    public TrieNode() {}
+    /**
+     * fail指针
+     */
+    private TrieNode fail;
 
-    public TrieNode(char data) {
-        this.data = data;
+    /**
+     * 是否是根节点
+     */
+    private Boolean isRoot = false;
+
+    /**
+     *
+     */
+    private boolean isEnd;
+
+    private int length;
+
+    public TrieNode() {
+        children = new HashMap<>();
+    }
+    public TrieNode(Boolean isEnd) {
+        this();
+        this.isRoot = isEnd;
     }
 
-    public char getData() {
-        return data;
+    public TrieNode insert(Character ch) {
+        TrieNode node = this.children.get(ch);
+        if (node == null) {
+            node = new TrieNode();
+            children.put(ch, node);
+        }
+        return node;
     }
 
-    public void setData(char data) {
-        this.data = data;
+    public TrieNode find(Character ch) {
+        return children.get(ch);
     }
 
-    public boolean isEndChar() {
-        return isEndChar;
+    public TrieNode nextState(Character ch) {
+        TrieNode state = this.find(ch);
+        // 存在节点，直接走
+        if (state != null) {
+            return state;
+        }
+        // 根节点就跳回自己
+        if (this.isRoot) {
+            return this;
+        }
+        // 跳转到fail指针下和我同样字符的地方
+        return this.fail.nextState(ch);
     }
 
-    public void setEndChar(boolean endChar) {
-        isEndChar = endChar;
+
+    public boolean isEnd() {
+        return isEnd;
     }
 
-    public TrieNode getFailNode() {
-        return failNode;
+    public void setEnd(boolean end) {
+        isEnd = end;
     }
 
-    public void setFailNode(TrieNode failNode) {
-        this.failNode = failNode;
+    public Collection<TrieNode> children() {
+        return this.children.values();
+    }
+
+    public Map<Character, TrieNode> getChildren() {
+        return children;
+    }
+
+    public TrieNode getFail() {
+        return fail;
+    }
+
+    public void setFail(TrieNode fail) {
+        this.fail = fail;
     }
 
     public int getLength() {
@@ -73,41 +93,5 @@ public class TrieNode {
 
     public void setLength(int length) {
         this.length = length;
-    }
-
-    public Map<Character, TrieNode> getChildren() {
-        return children;
-    }
-
-    public void setChildNode(Character data) {
-        TrieNode node = new TrieNode(data);
-        if (children == null) {
-            children = new HashMap<>();
-        }
-        children.put(data, node);
-    }
-
-    public TrieNode getChildNode(Character data) {
-        if (children == null) {
-            return null;
-        }
-        return children.get(data);
-    }
-
-    public Collection<Character> getChildrenDataList() {
-        if (children == null) {
-            return new ArrayList<>();
-        }
-        return children.keySet();
-    }
-
-    @Override
-    public String toString() {
-        return "TrieNode{" +
-                "data=" + data +
-                ", isEndChar=" + isEndChar +
-                ", length=" + length +
-                ", children=" + children +
-                '}';
     }
 }

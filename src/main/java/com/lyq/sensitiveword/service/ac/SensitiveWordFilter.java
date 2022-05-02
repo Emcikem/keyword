@@ -1,22 +1,22 @@
 package com.lyq.sensitiveword.service.ac;
 
+import cn.hutool.core.util.StrUtil;
 import com.lyq.sensitiveword.constant.CharConst;
 import com.lyq.sensitiveword.model.SensitiveWordContext;
 import com.lyq.sensitiveword.service.ISensitiveWordFilter;
 import com.lyq.sensitiveword.service.ISensitiveWordReplace;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * @author Emcikem
- * @create 2022/5/1
- * @desc
+ * @create 2022/5/2
+ * @desc ac自动机
  */
 @Service
 public class SensitiveWordFilter implements ISensitiveWordFilter {
@@ -24,106 +24,92 @@ public class SensitiveWordFilter implements ISensitiveWordFilter {
     /**
      * 根节点
      */
-    public TrieNode root = new TrieNode();
+    private final TrieNode root = new TrieNode(true);
 
-    /**
-     * 添加
-     */
-    public void insert(String sensitiveWord) {
-        TrieNode p = root;
-        for (int i = 0; i < sensitiveWord.length(); i++) {
-            char word = sensitiveWord.charAt(i);
-            TrieNode child = p.getChildNode(word);
-            if (child == null) {
-                p.setChildNode(word);
-            }
-            p = p.getChildNode(word);
+
+    private void insert(String str) {
+        if (StrUtil.isEmpty(str)) {
+            return;
         }
-        p.setLength(sensitiveWord.length());
-        p.setEndChar(true);
+        TrieNode currentState = this.root;
+        for (Character character : str.toCharArray()) {
+            currentState = currentState.insert(character);
+        }
+        currentState.setEnd(true);
+        currentState.setLength(str.length());
     }
 
-    public void getFail() {
-        Queue<TrieNode> nodes = new LinkedList<>();
-        root.setFailNode(null);
-        for (TrieNode node : root.getChildren().values()) {
-            node.setFailNode(root);
-            nodes.add(node);
+    private void getFail() {
+        Queue<TrieNode> queue = new LinkedList<>();
+        // 1. 将深度为1的节点的fail指针指向根节点
+        // 特殊处理：第二层要特殊处理，将这层中的节点的失败路径直接指向父节点(也就是根节点)
+        for (TrieNode depthOneState : this.root.children()) {
+            depthOneState.setFail(this.root);
+            queue.add(depthOneState);
         }
-        while (!nodes.isEmpty()) {
-            TrieNode currentNode = nodes.remove();
-            for (Character ch : currentNode.getChildrenDataList()) {
-                TrieNode child = currentNode.getChildNode(ch);
-                nodes.add(child);
 
-                // 我fail指针是我父亲的fail指针的节点作为根时，其孩子节点下和我值相同的那个节点，默认指向根节点
-                TrieNode childNode = currentNode.getFailNode().getChildNode(ch);
-                if (childNode == null) {
-                    child.setFailNode(root);
-                } else {
-                    child.setFailNode(childNode);
-                }
+        // 2. 进行dfs，求出所有点的fail指针，策略，我的fail指针就是我父亲节点的fail指针下得与我相同属性的节点
+        while (!queue.isEmpty()) {
+            TrieNode parentNode = queue.poll();
+            for (Character ch : parentNode.getChildren().keySet()) {
+                TrieNode childNode = parentNode.find(ch);
+                queue.add(childNode);
+                TrieNode failNode = parentNode.getFail().nextState(ch);
+                childNode.setFail(failNode);
+                // 这里，如果我符合的话，那么我的fail指针的nextState节点也符合，我们的后缀相同
             }
         }
     }
 
-    public List<SensitiveWordContext> query(String str) {
-        List<SensitiveWordContext> sensitiveList = new ArrayList<>();
-        TrieNode currentNode = root;
+    private List<SensitiveWordContext> query(String str) {
+        List<SensitiveWordContext> contextList = new ArrayList<>();
+        TrieNode currentState = this.root;
         for (int i = 0; i < str.length(); i++) {
-            char ch = str.charAt(i);
-            if (currentNode == null) {
-                currentNode = root;
+            Character ch = str.charAt(i);
+            currentState = currentState.nextState(ch);
+            if (currentState.getLength() != 0) {
+                contextList.add(new SensitiveWordContext(str.substring(i - currentState.getLength() + 1, i + 1), i - currentState.getLength() + 1, i));
             }
-            currentNode = currentNode.getChildNode(ch);
-            for (TrieNode node = currentNode; node != root && node != null; node = node.getFailNode()) {
-                if (node.isEndChar()) {
-                    sensitiveList.add(new SensitiveWordContext(str.substring(i - node.getLength() + 1, i + 1), i - node.getLength() + 1, i));
+            // TODO:策略是什么，下面为什么要进行这一步？优先过滤长的还是优先过滤短的？
+//            for (TrieNode node = currentState; node != null && node != this.root; node = node.getFail()) {
+//                if (node.isEnd()) { // 这么读取会有重复
+//                    contextList.add(new SensitiveWordContext(str.substring(i - node.getLength() + 1, i + 1), i - node.getLength() + 1, i));
+//                }
+//            }
+        }
+        return contextList;
+    }
+
+
+
+    @Value("#{'${sensitive.filePath}'.split(',')}")
+    private List<String> sensitivePath;
+
+    public void initSensitive() throws FileNotFoundException {
+        Set<String> sensitive = new HashSet<>();
+        for (String filePath : sensitivePath) {
+            InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream(filePath);
+            if (resourceAsStream == null) {
+                throw new FileNotFoundException();
+            }
+            try {
+                BufferedReader br = new BufferedReader(new InputStreamReader(resourceAsStream, StandardCharsets.UTF_8));
+                String lineTxt;
+                // 逐行读取
+                while ((lineTxt = br.readLine()) != null) {
+                    // 输出内容到控制台
+                    lineTxt = lineTxt.replace(" ", "");
+                    if (sensitive.contains(lineTxt)) {
+                        continue;
+                    }
+                    sensitive.add(lineTxt);
+                    this.insert(lineTxt);
                 }
-            }
-            if (currentNode != null && currentNode.isEndChar()) {
-                currentNode = currentNode.getFailNode();
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-        return sensitiveList;
-    }
-
-    public static void readText(String path, SensitiveWordFilter filter) {
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path), StandardCharsets.UTF_8));
-            String lineTxt;
-            // 逐行读取
-            while ((lineTxt = br.readLine()) != null) {
-                // 输出内容到控制台
-                filter.insert(lineTxt);
-            }
-            br.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static String readText(String path) {
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path), StandardCharsets.UTF_8));
-            String lineTxt;
-            StringBuilder str = new StringBuilder();
-            // 逐行读取
-            while ((lineTxt = br.readLine()) != null) {
-                // 输出内容到控制台
-                str.append(lineTxt).append("\n");
-            }
-            br.close();
-            return str.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public void initSensitive() {
-        readText("/Users/emcikem/IdeaProjects/keyword/sensitive-word/src/main/resources/sensitive.txt", this);
         this.getFail();
     }
 
@@ -158,7 +144,7 @@ public class SensitiveWordFilter implements ISensitiveWordFilter {
                 chars[i] = ch;
             }
         });
-        return Arrays.toString(chars);
+        return String.valueOf(chars);
     }
 
     @Override

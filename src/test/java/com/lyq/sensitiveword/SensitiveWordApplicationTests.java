@@ -1,15 +1,18 @@
 package com.lyq.sensitiveword;
 
-import com.lyq.sensitiveword.service.ISensitiveWordFilter;
+import com.lyq.sensitiveword.service.ac.SensitiveWordFilter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.io.FileNotFoundException;
+import java.util.List;
 
 @SpringBootTest
 class SensitiveWordApplicationTests {
 
     @Autowired
-    private ISensitiveWordFilter iSensitiveWordFilter;
+    private SensitiveWordFilter iSensitiveWordFilter;
 
     @Test
     void contextLoads() {
@@ -17,9 +20,9 @@ class SensitiveWordApplicationTests {
 
 
     @Test
-    public void test() {
+    public void test() throws FileNotFoundException {
         iSensitiveWordFilter.initSensitive();
-        String str = iSensitiveWordFilter.replace("陈强是傻逼吧");
-        System.out.println(str);
+        List<String> aaa = iSensitiveWordFilter.findAll("陈强是一个情色大师");
+        System.out.println(aaa);
     }
 }

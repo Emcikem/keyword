@@ -2,6 +2,7 @@ package com.lyq.sensitiveword.service;
 
 import com.lyq.sensitiveword.model.SensitiveWordContext;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ public interface ISensitiveWordFilter {
     /**
      * 初始化
      */
-    void initSensitive();
+    void initSensitive() throws FileNotFoundException;
 
     /**
      * 是否包含敏感词
