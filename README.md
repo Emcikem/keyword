@@ -12,8 +12,14 @@ AC自动机实现字符串的过滤，时间复杂度O(n)
 ## 使用
 注入SensitiveHelper类，然后用里面的replace方法就可以。
 
-自定义实现
+文字过滤的步骤是
+1. 文件格式化
+2. 敏感词查找
+3. 敏感词替换
+所以基于这个步骤，实现了可配置化：
 
+1. 对于格式化来说，在WordContext类里面进行配置
+2. 对于替换策略来说，实现ISensitiveWordReplace接口的replace接口即可
 
 ## TODO
 1. 检测网站
