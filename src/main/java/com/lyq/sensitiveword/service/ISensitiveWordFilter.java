@@ -12,10 +12,16 @@ import java.util.List;
  */
 public interface ISensitiveWordFilter {
 
+
+    /**
+     * 添加敏感词
+     */
+    void addSensitive(String sensitiveWord);
+
     /**
      * 初始化
      */
-    void initSensitive() throws FileNotFoundException;
+    void flush();
 
     /**
      * 是否包含敏感词
@@ -35,15 +41,15 @@ public interface ISensitiveWordFilter {
     /**
      * 默认用*替换
      */
-    String replace(String target);
+    String replace(String target, String filterStr);
 
     /**
      * 自定义替换词
      */
-    String replace(String target, char ch);
+    String replace(String target, char ch, String filterStr);
 
     /**
      * 自定义替换策略
      */
-    String replace(String target, ISensitiveWordReplace replace);
+    String replace(String target, ISensitiveWordReplace replace, String filterStr);
 }

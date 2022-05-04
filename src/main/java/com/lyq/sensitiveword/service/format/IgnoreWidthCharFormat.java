@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * @desc
  */
 @Service
-public abstract class IgnoreWidthCharFormat implements ICharFormatService {
+public class IgnoreWidthCharFormat implements ICharFormatService {
 
 
     @Override

@@ -5,11 +5,8 @@ import com.lyq.sensitiveword.constant.CharConst;
 import com.lyq.sensitiveword.model.SensitiveWordContext;
 import com.lyq.sensitiveword.service.ISensitiveWordFilter;
 import com.lyq.sensitiveword.service.ISensitiveWordReplace;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -80,39 +77,6 @@ public class SensitiveWordFilter implements ISensitiveWordFilter {
         return contextList;
     }
 
-
-
-    @Value("#{'${sensitive.filePath}'.split(',')}")
-    private List<String> sensitivePath;
-
-    public void initSensitive() throws FileNotFoundException {
-        Set<String> sensitive = new HashSet<>();
-        for (String filePath : sensitivePath) {
-            InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream(filePath);
-            if (resourceAsStream == null) {
-                throw new FileNotFoundException();
-            }
-            try {
-                BufferedReader br = new BufferedReader(new InputStreamReader(resourceAsStream, StandardCharsets.UTF_8));
-                String lineTxt;
-                // 逐行读取
-                while ((lineTxt = br.readLine()) != null) {
-                    // 输出内容到控制台
-                    lineTxt = lineTxt.replace(" ", "");
-                    if (sensitive.contains(lineTxt)) {
-                        continue;
-                    }
-                    sensitive.add(lineTxt);
-                    this.insert(lineTxt);
-                }
-                br.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        this.getFail();
-    }
-
     @Override
     public boolean contains(String target) {
         return query(target).isEmpty();
@@ -131,13 +95,13 @@ public class SensitiveWordFilter implements ISensitiveWordFilter {
     }
 
     @Override
-    public String replace(String target) {
-        return this.replace(target, CharConst.STAR);
+    public String replace(String target, String filterStr) {
+        return this.replace(target, CharConst.STAR, filterStr);
     }
 
     @Override
-    public String replace(String target, char ch) {
-        List<SensitiveWordContext> result = query(target);
+    public String replace(String target, char ch, String filterStr) {
+        List<SensitiveWordContext> result = query(filterStr);
         char[] chars = target.toCharArray();
         result.forEach(context -> {
             for (int i = context.getStartIndex(); i <= context.getEndIndex(); i++) {
@@ -148,9 +112,9 @@ public class SensitiveWordFilter implements ISensitiveWordFilter {
     }
 
     @Override
-    public String replace(String target, ISensitiveWordReplace replace) {
+    public String replace(String target, ISensitiveWordReplace replace, String filterStr) {
         int var1 = 0, var2 = 0;
-        List<SensitiveWordContext> result = query(target);
+        List<SensitiveWordContext> result = query(filterStr);
         StringBuilder stringBuilder = new StringBuilder();
         while (var2 < result.size()) {
             SensitiveWordContext context = result.get(var2);
@@ -165,5 +129,13 @@ public class SensitiveWordFilter implements ISensitiveWordFilter {
             stringBuilder.append(target.charAt(var1++));
         }
         return stringBuilder.toString();
+    }
+
+    public void addSensitive(String sensitiveWord) {
+        this.insert(sensitiveWord);
+    }
+
+    public void flush(){
+        this.getFail();
     }
 }

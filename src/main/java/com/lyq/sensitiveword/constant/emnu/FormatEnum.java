@@ -11,7 +11,10 @@ public enum FormatEnum {
     CHINESESTYLE("CHINESESTYLE", "忽略简繁体"),
     ENGLISHSTYLE("ENGLISHSTYLE", "忽略英文"),
     NUMBERSTYLE("NUMBERSTYLE", "忽略数字"),
-    WIDTHCHAR("WIDTHCHAR", "忽略全半角符")
+    WIDTHCHAR("WIDTHCHAR", "忽略全半角符"),
+    EMAIL("EMAI", "过滤邮箱"),
+    URL("URL", "过滤网站"),
+    PHONE("PHONE", "过滤手机号")
     ;
 
     private final String type;

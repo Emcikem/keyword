@@ -5,6 +5,7 @@ import com.lyq.sensitiveword.model.SensitiveWordContext;
 import com.lyq.sensitiveword.model.WordContext;
 import com.lyq.sensitiveword.service.ISensitiveWordFilter;
 import com.lyq.sensitiveword.service.ISensitiveWordReplace;
+import com.lyq.sensitiveword.service.data.SensitiveWordData;
 import com.lyq.sensitiveword.service.impl.CharFormatServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -26,26 +27,35 @@ public class SensitiveHelper {
     private boolean hasInitSensitive;
 
     @Resource
-    private CharFormatServiceImpl charFormat;
+    private CharFormatServiceImpl charFormatService;
 
     @Resource
     private ISensitiveWordFilter iSensitiveWordFilter;
 
+    @Resource
+    private SensitiveWordData sensitiveWordData;
+
 
     private String format(String target, WordContext context) {
         char[] chars = target.toCharArray();
-        for (char ch : chars) {
-            ch = charFormat.format(ch, context);
+        for (int i = 0; i < chars.length; i++) {
+            chars[i] = charFormatService.format(chars[i], context);
         }
+
         return String.valueOf(chars);
     }
 
 
+    /**
+     * 单例模式初始化敏感词
+     */
     private void checkState() {
         synchronized (this) {
             if (!this.hasInitSensitive) {
                 try {
-                    iSensitiveWordFilter.initSensitive();
+                    List<String> data = sensitiveWordData.getData();
+                    data.forEach(word -> iSensitiveWordFilter.addSensitive(word));
+                    iSensitiveWordFilter.flush();
                     this.hasInitSensitive = true;
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -59,8 +69,8 @@ public class SensitiveHelper {
      */
     public boolean contains(String target, WordContext context) {
         checkState();
-        target = format(target, context);
-        return iSensitiveWordFilter.contains(target);
+        String filterStr = format(target, context);
+        return iSensitiveWordFilter.contains(filterStr);
     }
 
     /**
@@ -68,8 +78,8 @@ public class SensitiveHelper {
      */
     public List<String> findAll(String target, WordContext context) {
         checkState();
-        target = format(target, context);
-        return iSensitiveWordFilter.findAll(target);
+        String filterStr = format(target, context);
+        return iSensitiveWordFilter.findAll(filterStr);
     }
 
     /**
@@ -77,8 +87,8 @@ public class SensitiveHelper {
      */
     List<SensitiveWordContext> findAllContext(String target, WordContext context) {
         checkState();
-        target = format(target, context);
-        return iSensitiveWordFilter.findAllContext(target);
+        String filterStr = format(target, context);
+        return iSensitiveWordFilter.findAllContext(filterStr);
     }
 
     /**
@@ -93,8 +103,8 @@ public class SensitiveHelper {
      */
     public String replace(String target, WordContext context) {
         checkState();
-        target = format(target, context);
-        return iSensitiveWordFilter.replace(target);
+        String filterStr = format(target, context);
+        return iSensitiveWordFilter.replace(target, filterStr);
     }
 
     /**
@@ -102,8 +112,8 @@ public class SensitiveHelper {
      */
     public String replace(String target, char ch, WordContext context) {
         checkState();
-        target = format(target, context);
-        return iSensitiveWordFilter.replace(target, ch);
+        String filterStr = format(target, context);
+        return iSensitiveWordFilter.replace(target, ch, filterStr);
     }
 
     /**
@@ -111,8 +121,8 @@ public class SensitiveHelper {
      */
     public String replace(String target, ISensitiveWordReplace replace, WordContext context) {
         checkState();
-        target = format(target, context);
-        return iSensitiveWordFilter.replace(target, replace);
+        String filterStr = format(target, context);
+        return iSensitiveWordFilter.replace(target, replace, filterStr);
     }
 
     /**

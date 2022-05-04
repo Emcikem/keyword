@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * @desc
  */
 @Service
-public abstract class CharFormatServiceImpl implements ICharFormatService {
+public class CharFormatServiceImpl implements ICharFormatService {
 
     private final Map<String, ICharFormatService> formatMap;
 
@@ -35,11 +35,28 @@ public abstract class CharFormatServiceImpl implements ICharFormatService {
         if (context.ignoreCase()) {
             charFormats.add(formatMap.get(FormatEnum.CASECHAR.getType()));
         }
-
+        if (context.ignoreWidth()) {
+            charFormats.add(formatMap.get(FormatEnum.WIDTHCHAR.getType()));
+        }
+        if (context.ignoreChineseStyle()) {
+            charFormats.add(formatMap.get(FormatEnum.CHINESESTYLE.getType()));
+        }
+        if (context.ignoreEnglishStyle()) {
+            charFormats.add(formatMap.get(FormatEnum.ENGLISHSTYLE.getType()));
+        }
+        if (context.ignoreNumStyle()) {
+            charFormats.add(formatMap.get(FormatEnum.NUMBERSTYLE.getType()));
+        }
 
         for (ICharFormatService charFormat : charFormats) {
             result = charFormat.format(result, context);
         }
+
         return result;
+    }
+
+    @Override
+    public String getType() {
+        return "null";
     }
 }
