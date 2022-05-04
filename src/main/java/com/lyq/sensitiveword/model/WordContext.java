@@ -1,7 +1,5 @@
 package com.lyq.sensitiveword.model;
 
-import java.lang.reflect.Field;
-import java.util.List;
 
 /**
  * @author Emcikem

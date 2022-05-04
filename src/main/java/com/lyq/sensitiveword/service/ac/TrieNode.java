@@ -8,7 +8,7 @@ import java.util.*;
  * @desc
  */
 public class TrieNode {
-    private Map<Character, TrieNode> children;
+    private final Map<Character, TrieNode> children;
 
     /**
      * fail指针
@@ -19,11 +19,6 @@ public class TrieNode {
      * 是否是根节点
      */
     private Boolean isRoot = false;
-
-    /**
-     *
-     */
-    private boolean isEnd;
 
     private int length;
 
@@ -60,15 +55,6 @@ public class TrieNode {
         }
         // 跳转到fail指针下和我同样字符的地方
         return this.fail.nextState(ch);
-    }
-
-
-    public boolean isEnd() {
-        return isEnd;
-    }
-
-    public void setEnd(boolean end) {
-        isEnd = end;
     }
 
     public Collection<TrieNode> children() {

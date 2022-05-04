@@ -32,7 +32,6 @@ public class SensitiveWordFilter implements ISensitiveWordFilter {
         for (Character character : str.toCharArray()) {
             currentState = currentState.insert(character);
         }
-        currentState.setEnd(true);
         currentState.setLength(str.length());
     }
 

@@ -45,7 +45,7 @@ public class SensitiveWordData {
                 e.printStackTrace();
             }
         }
-        return new ArrayList(sensitive);
+        return new ArrayList<>(sensitive);
     }
 
 
