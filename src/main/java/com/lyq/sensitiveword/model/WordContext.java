@@ -52,6 +52,18 @@ public class WordContext {
      */
     private boolean sensitiveCheckUrl;
 
+    public static WordContext defaultWordContext() {
+        return new WordContext()
+                .ignoreCase(true)
+                .ignoreChineseStyle(true)
+                .ignoreEnglishStyle(true)
+                .ignoreNumStyle(true)
+                .ignoreWidth(true)
+                .ignoreRepeat(true)
+                .sensitiveCheckEmail(true)
+                .sensitiveCheckUrl(true);
+    }
+
     public boolean ignoreCase() {
         return ignoreCase;
     }

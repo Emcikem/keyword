@@ -7,10 +7,19 @@ package com.lyq.sensitiveword.model;
  */
 public class SensitiveWordContext {
 
+    /**
+     * 敏感词
+     */
     private String sensitiveWord;
 
+    /**
+     * 敏感词在target的起始位置
+     */
     private int startIndex;
 
+    /**
+     * 敏感词在target的末位置
+     */
     private int endIndex;
 
     public SensitiveWordContext(String sensitiveWord, int startIndex, int endIndex) {

@@ -158,7 +158,11 @@ public class SensitiveWordFilter implements ISensitiveWordFilter {
                 stringBuilder.append(target.charAt(var1++));
             }
             stringBuilder.append(replace.replace(context.getSensitiveWord()));
-            var2 = context.getEndIndex() + 1;
+            var1 = context.getEndIndex() + 1;
+            var2++;
+        }
+        while (var1 < target.length()) {
+            stringBuilder.append(target.charAt(var1++));
         }
         return stringBuilder.toString();
     }
